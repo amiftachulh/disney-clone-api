@@ -10,6 +10,14 @@ const auth = new Hono()
   .post("/register", validate("json", registerSchema), async (c) => {
     const { phone, password } = c.req.valid("json");
 
+    const account = await prisma.account.findUnique({
+      where: { phone },
+    });
+
+    if (account) {
+      return c.json(res("Account already exists."), 409);
+    }
+
     const hashedPassword = await Bun.password.hash(password, {
       algorithm: "bcrypt",
     });
