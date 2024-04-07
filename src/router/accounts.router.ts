@@ -8,7 +8,13 @@ const accounts = new Hono()
   .get("/me", async (c) => {
     const account = await prisma.account.findUnique({
       where: { id: c.get("user").id },
-      include: { profiles: true },
+      select: {
+        id: true,
+        phone: true,
+        createdAt: true,
+        updatedAt: true,
+        profiles: true,
+      }
     });
 
     if (!account) {
