@@ -4,9 +4,13 @@ const envVariables = z.object({
   NODE_ENV: z.string().optional(),
   DATABASE_URL: z.string(),
   JWT_SECRET: z.string(),
+  TMDB_API_URL: z.string(),
+  TMDB_API_KEY: z.string(),
 });
 
-envVariables.parse(process.env);
+export function validateEnv() {
+  envVariables.parse(process.env);
+}
 
 declare global {
   namespace NodeJS {
