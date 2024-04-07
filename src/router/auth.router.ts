@@ -64,7 +64,7 @@ const auth = new Hono()
       sameSite: "None",
     });
 
-    return c.json(res("Login successful.", data));
+    return c.json(res("Login successful.", { id, ...data }));
   })
   .post("/logout", async (c) => {
     const session = getCookie(c, "session");
