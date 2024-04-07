@@ -20,16 +20,17 @@ model Account {
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
   profiles  Profile[]
+  sessions  Session[]
 
   @@map("accounts")
 }
 
 model Session {
   id        String   @id @default(uuid())
-  profileId String   @map("account_id")
+  accountId String   @map("account_id")
   token     String   @unique
   createdAt DateTime @default(now()) @map("created_at")
-  profile   Profile  @relation(fields: [profileId], references: [id])
+  account   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
 
   @@map("sessions")
 }
@@ -40,9 +41,8 @@ model Profile {
   name       String
   createdAt  DateTime    @default(now()) @map("created_at")
   updatedAt  DateTime    @updatedAt @map("updated_at")
-  account    Account     @relation(fields: [accountId], references: [id])
+  account    Account     @relation(fields: [accountId], references: [id], onDelete: Cascade)
   recommends Recommend[]
-  sessions   Session[]
 
   @@map("profiles")
 }
@@ -52,7 +52,7 @@ model Recommend {
   profileId String   @map("profile_id")
   movieId   String   @map("movie_id")
   createdAt DateTime @default(now()) @map("created_at")
-  profile   Profile  @relation(fields: [profileId], references: [id])
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
   @@unique([profileId, movieId])
   @@map("recommends")

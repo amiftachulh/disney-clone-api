@@ -16,7 +16,7 @@ const auth = new Hono()
 
     const { phone, password } = valid.data;
 
-    const account = await prisma.account.findUnique({
+    let account = await prisma.account.findUnique({
       where: { phone },
       include: { profiles: true },
     });
@@ -26,39 +26,45 @@ const auth = new Hono()
       if (!isMatch) {
         return c.json(res("Incorrect password."), 401);
       }
+    } else {
+      const validRegister = registerSchema.safeParse({ phone, password });
+      if (!validRegister.success) {
+        return c.json(res(validRegister.error.message), 400);
+      }
 
-      const { id, password: _, ...data } = account;
-      const exp = Math.floor(Date.now() / 1000) + 60 * 60 * 24;
-      const token = await sign({ id, exp }, process.env.JWT_SECRET);
-
-      setCookie(c, "session", token, {
-        path: "/",
-        secure: true,
-        httpOnly: true,
-        expires: new Date(exp * 1000),
-        sameSite: "None",
+      const hashedPassword = await Bun.password.hash(password, {
+        algorithm: "bcrypt",
       });
 
-      return c.json(res("Login successful.", data));
+      account = await prisma.account.create({
+        data: {
+          phone,
+          password: hashedPassword,
+        },
+        include: { profiles: true },
+      });
     }
 
-    const validRegister = registerSchema.safeParse({ phone, password });
-    if (!validRegister.success) {
-      return c.json(res(validRegister.error.message), 400);
-    }
+    const { id, password: _, ...data } = account;
+    const exp = Math.floor(Date.now() / 1000) + 60 * 60 * 24;
+    const token = await sign({ id, exp }, process.env.JWT_SECRET);
 
-    const hashedPassword = await Bun.password.hash(password, {
-      algorithm: "bcrypt",
-    });
-
-    await prisma.account.create({
+    await prisma.session.create({
       data: {
-        phone,
-        password: hashedPassword,
-      },
+        accountId: id,
+        token,
+      }
     });
 
-    return c.json(res("Account created."));
+    setCookie(c, "session", token, {
+      path: "/",
+      secure: true,
+      httpOnly: true,
+      expires: new Date(exp * 1000),
+      sameSite: "None",
+    });
+
+    return c.json(res("Login successful.", data));
   })
   .post("/logout", async (c) => {
     const session = getCookie(c, "session");
