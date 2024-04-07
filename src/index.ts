@@ -19,4 +19,11 @@ app.get("/", (c) => {
 
 app.route("/v1", router);
 
+app.onError((err, c) => {
+  console.error(err);
+  return c.json({ error: "Internal server error." }, 500);
+});
+
+console.log("Server started.");
+
 export default app;

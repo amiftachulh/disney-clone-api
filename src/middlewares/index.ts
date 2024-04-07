@@ -7,6 +7,7 @@ import { Auth } from "../types";
 import { getCookie } from "hono/cookie";
 import { verify } from "hono/jwt";
 import { jwtPayloadSchema } from "../schemas/auth.schema";
+import prisma from "../config/prisma";
 
 export function validate<
   Target extends keyof ValidationTargets,
@@ -53,6 +54,14 @@ export const authenticate = createMiddleware<{ Variables: Auth }>(async (c, next
 
   const verified = jwtPayloadSchema.safeParse(decoded);
   if (!verified.success) {
+    return c.json(res("Unauthorized"), 401);
+  }
+
+  const token = await prisma.session.findUnique({
+    where: { token: session }
+  })
+
+  if (!token) {
     return c.json(res("Unauthorized"), 401);
   }
 

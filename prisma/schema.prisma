@@ -24,14 +24,25 @@ model Account {
   @@map("accounts")
 }
 
+model Session {
+  id        String   @id @default(uuid())
+  profileId String   @map("account_id")
+  token     String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  profile   Profile  @relation(fields: [profileId], references: [id])
+
+  @@map("sessions")
+}
+
 model Profile {
-  id        String      @id @default(uuid())
-  accountId String      @map("account_id")
-  name      String
-  createdAt DateTime    @default(now()) @map("created_at")
-  updatedAt DateTime    @updatedAt @map("updated_at")
-  account   Account     @relation(fields: [accountId], references: [id])
-  recommend Recommend[]
+  id         String      @id @default(uuid())
+  accountId  String      @map("account_id")
+  name       String
+  createdAt  DateTime    @default(now()) @map("created_at")
+  updatedAt  DateTime    @updatedAt @map("updated_at")
+  account    Account     @relation(fields: [accountId], references: [id])
+  recommends Recommend[]
+  sessions   Session[]
 
   @@map("profiles")
 }
