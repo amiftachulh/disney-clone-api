@@ -9,7 +9,12 @@ const envVariables = z.object({
 });
 
 export function validateEnv() {
-  envVariables.parse(process.env);
+  try {
+    envVariables.parse(process.env);
+  } catch (error) {
+    console.error((error as z.ZodError).flatten().fieldErrors);
+    process.exit(1);
+  }
 }
 
 declare global {
