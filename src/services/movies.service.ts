@@ -53,4 +53,3 @@ export async function getMovieById(id: string) {
     throw error;
   }
 }
-}
