@@ -69,3 +69,25 @@ export const authenticate = createMiddleware<{ Variables: Auth }>(async (c, next
 
   await next();
 });
+
+export const validateProfile = createMiddleware<{ Variables: Auth & { profile: string } }>(async (c, next) => {
+  const profileId = getCookie(c, "profile");
+  if (!profileId) {
+    return c.json(res("Profile not found."), 404);
+  }
+
+  const profile = await prisma.profile.findUnique({
+    where: {
+      id: profileId,
+      accountId: c.get("user").id
+    }
+  });
+
+  if (!profile) {
+    return c.json(res("Profile not found."), 404);
+  }
+
+  c.set("profile", profile.id);
+
+  await next();
+})
