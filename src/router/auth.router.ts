@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { sign } from "hono/jwt";
-import { getCookie, setCookie } from "hono/cookie";
+import { deleteCookie, getCookie, setCookie } from "hono/cookie";
 import { loginSchema, registerSchema } from "../schemas/auth.schema";
 import prisma from "../config/prisma";
 import { res } from "../utils";
@@ -76,11 +76,17 @@ const auth = new Hono()
       where: { token: session },
     });
 
-    setCookie(c, "session", "", {
+    deleteCookie(c, "session", {
       path: "/",
       secure: true,
       httpOnly: true,
-      maxAge: 0,
+      sameSite: "None",
+    });
+
+    deleteCookie(c, "profile", {
+      path: "/",
+      secure: true,
+      httpOnly: true,
       sameSite: "None",
     });
 

@@ -13,8 +13,14 @@ const accounts = new Hono()
         phone: true,
         createdAt: true,
         updatedAt: true,
-        profiles: true,
-      }
+        profiles: {
+          select: {
+            id: true,
+            name: true,
+          },
+          orderBy: { name: "asc" },
+        },
+      },
     });
 
     if (!account) {

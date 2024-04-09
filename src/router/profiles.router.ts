@@ -28,7 +28,8 @@ const profiles = new Hono()
     return c.json(res("Success."), 201);
   })
   .get("/:id", async (c) => {
-    const profile = await getProfileById(c.req.param("id"), c.get("user").id);
+    const user = c.get("user");
+    const profile = await getProfileById(c.req.param("id"), user.id);
     if (!profile) {
       return c.json(res("Profile not found."), 404);
     }
@@ -37,6 +38,7 @@ const profiles = new Hono()
       path: "/",
       httpOnly: true,
       secure: true,
+      expires: new Date(user.exp * 1000),
       sameSite: "None",
     });
 

@@ -12,6 +12,7 @@ export const loginSchema = z.object({
 
 export const jwtPayloadSchema = z.object({
   id: z.string(),
+  exp: z.number(),
 });
 
 export type RegisterSchema = z.infer<typeof registerSchema>;
