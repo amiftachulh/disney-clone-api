@@ -6,6 +6,10 @@ To install dependencies:
 bun install
 ```
 
+# Set .env
+
+Copy `.env.example` and rename it to `.env`
+
 # MySQL
 
 Run MySQL server and add `disney_clone` database using GUI or run:
@@ -35,10 +39,6 @@ If prisma not generating types after db push or migration, run:
 ```sh
 bunx prisma generate
 ```
-
-# Set .env
-
-Copy .env.example and rename it to .env
 
 # Run Development Server
 
