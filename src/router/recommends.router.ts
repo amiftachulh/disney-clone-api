@@ -14,7 +14,7 @@ const recommends = new Hono()
       return c.json(res("Movie not found."), 404);
     }
 
-    const profileId = c.get("profile");
+    const profileId = c.get("profile").id;
     const recommend = await prisma.recommend.findFirst({
       where: {
         movieId,
@@ -39,7 +39,7 @@ const recommends = new Hono()
     const recommend = await prisma.recommend.findFirst({
       where: {
         movieId: c.req.param("id"),
-        profileId: c.get("profile"),
+        profileId: c.get("profile").id,
       }
     });
 

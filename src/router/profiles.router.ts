@@ -1,6 +1,6 @@
 import { Hono } from "hono";
-import { setCookie } from "hono/cookie";
-import { authenticate, validate } from "../middlewares";
+import { getCookie, setCookie } from "hono/cookie";
+import { authenticate, validate, validateProfile } from "../middlewares";
 import prisma from "../config/prisma";
 import { res } from "../utils";
 import { profileSchema } from "../schemas/profiles.schema";
@@ -26,6 +26,9 @@ const profiles = new Hono()
     });
 
     return c.json(res("Success."), 201);
+  })
+  .get("/me", validateProfile, async (c) => {
+    return c.json(res("Success.", c.get("profile")));
   })
   .get("/:id", async (c) => {
     const user = c.get("user");

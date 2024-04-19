@@ -8,6 +8,7 @@ import { getCookie } from "hono/cookie";
 import { verify } from "hono/jwt";
 import { jwtPayloadSchema } from "../schemas/auth.schema";
 import prisma from "../config/prisma";
+import { Profile } from "@prisma/client";
 
 export function validate<
   Target extends keyof ValidationTargets,
@@ -70,7 +71,7 @@ export const authenticate = createMiddleware<{ Variables: Auth }>(async (c, next
   await next();
 });
 
-export const validateProfile = createMiddleware<{ Variables: Auth & { profile: string } }>(async (c, next) => {
+export const validateProfile = createMiddleware<{ Variables: Auth & { profile: Profile } }>(async (c, next) => {
   const profileId = getCookie(c, "profile");
   if (!profileId) {
     return c.json(res("Profile not found."), 404);
@@ -87,7 +88,7 @@ export const validateProfile = createMiddleware<{ Variables: Auth & { profile: s
     return c.json(res("Profile not found."), 404);
   }
 
-  c.set("profile", profile.id);
+  c.set("profile", profile);
 
   await next();
 })
